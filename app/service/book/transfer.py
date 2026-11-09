@@ -129,8 +129,8 @@ def _book(file: bytes) -> ElementTree.Element:
     except ElementTree.ParseError:
         raise ValueError(BROKEN) from None
     raise ValueError(
-        "В файле нет книги GOSTwriter: импортировать можно только публикацию, "
-        "собранную в GOSTwriter"
+        "В файле нет книги Inkwise: импортировать можно только публикацию, "
+        "собранную в Inkwise"
     )
 
 
@@ -144,7 +144,7 @@ def _entries(book: ElementTree.Element) -> list[tuple[PurePosixPath, bytes | str
         ValueError: другая версия книги или книга испорчена.
     """
     if book.get("version") != VERSION:
-        raise ValueError("Книгу в файле записала другая версия GOSTwriter")
+        raise ValueError("Книгу в файле записала другая версия Inkwise")
     entries: dict[PurePosixPath, bytes | str] = {}
     for element in book:
         written = element.get("path", "")

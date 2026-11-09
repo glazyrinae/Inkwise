@@ -58,7 +58,7 @@ def install(template: Path) -> list[str]:
     if unknown:
         raise FontError(
             f"Шрифта нет ни в office, ни в Google Fonts: {', '.join(sorted(unknown))}. "
-            "Его файлы .ttf или .otf можно положить в папку шрифтов GOSTwriter "
+            "Его файлы .ttf или .otf можно положить в папку шрифтов Inkwise "
             "(FONTS_DIR), office поставит их сам, — и загрузить образец снова"
         )
     downloaded = []

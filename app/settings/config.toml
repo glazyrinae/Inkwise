@@ -1,5 +1,5 @@
 [app]
-title = "GOSTwriter"
+title = "Inkwise"
 version = "0.1.0"
 debug = true
 log_level = "INFO"
