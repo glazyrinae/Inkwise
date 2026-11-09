@@ -1,0 +1,85 @@
+/* Окна: общее для всех — рамка, заголовок, поля, кнопки внизу */
+dialog {
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 20%);
+}
+
+#settings,
+#spelling {
+  width: min(460px, 92vw);
+}
+
+dialog header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+dialog .fields {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+dialog label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+dialog input,
+dialog textarea,
+dialog select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  color: #222;
+  resize: vertical;
+}
+
+dialog input[readonly] {
+  background: var(--panel);
+}
+
+dialog p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.warning {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fff4e5;
+  color: #8a4b00;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+
+.buttons button {
+  padding: 4px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.buttons .primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}

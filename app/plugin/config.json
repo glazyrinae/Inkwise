@@ -1,0 +1,20 @@
+{
+  "name": "Цитата",
+  "guid": "asc.{C07E3B9A-253E-41CC-A6D4-CF41CD86C3D8}",
+  "version": "0.3.0",
+  "variations": [
+    {
+      "description": "Цитата со сноской из книги или веб-страницы, проверка орфографии, заголовки раздела",
+      "url": "index.html",
+      "icons": [],
+      "type": "system",
+      "isViewer": true,
+      "EditorsSupport": ["word", "pdf"],
+      "isVisual": false,
+      "initDataType": "none",
+      "initData": "",
+      "buttons": [],
+      "events": ["onContextMenuShow", "onContextMenuClick", "onTargetPositionChanged"]
+    }
+  ]
+}

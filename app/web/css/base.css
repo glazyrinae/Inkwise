@@ -1,0 +1,90 @@
+/* Раскладка как в IDE: полоса кнопок, панель структуры, редакторы во всю высоту окна */
+:root {
+  --line: #d6d6d6;
+  --panel: #f6f6f6;
+  --hover: #e6e6e6;
+  --accent: #2f6fde;
+  --muted: #777;
+}
+
+/* Иначе display из правил ниже перебил бы атрибут hidden */
+[hidden] {
+  display: none !important;
+}
+
+/* Flex, а не grid: скрытая панель структуры не должна сдвигать редакторы в её колонку */
+body {
+  display: flex;
+  height: 100vh;
+  margin: 0;
+  font: 14px/1.4 system-ui, sans-serif;
+  color: #222;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.pane {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Книга справа — доля ширины: её меняет разделитель, текст блока берёт остальное */
+#material {
+  flex: 0 0 50%;
+}
+
+.hint {
+  margin: 24px;
+  color: var(--muted);
+}
+
+/* Разделитель шире своей линии: за него легко ухватиться, а лишнего места он не
+   занимает — заходит на соседние панели. Над редакторами его держит z-index */
+.splitter {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 7px;
+  margin: 0 -3px;
+  background: linear-gradient(var(--line), var(--line)) center / 1px 100% no-repeat;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.splitter:hover,
+.splitter:active {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 3px 100%;
+}
+
+/* Разделитель виден, только пока видна его панель */
+#chapters[hidden] + .splitter,
+.splitter:has(+ #material[hidden]) {
+  display: none;
+}
+
+/* Пока тянут разделитель, редакторы не забирают мышь себе: иначе над iframe он бы
+   остановился */
+.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.resizing iframe {
+  pointer-events: none;
+}

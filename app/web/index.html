@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>GOSTwriter</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/bar.css">
+  <link rel="stylesheet" href="css/tree.css">
+  <link rel="stylesheet" href="css/dialogs.css">
+  <link rel="stylesheet" href="css/library.css">
+  <link rel="stylesheet" href="css/source.css">
+  <link rel="stylesheet" href="css/extensions.css">
+  <script type="module" src="js/shell.js"></script>
+</head>
+<body>
+  <nav class="bar">
+    <button id="toggle-chapters" type="button" title="Скрыть или показать структуру книги"
+            aria-pressed="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path class="fill" d="M5.5 4H9v16H5.5A2.5 2.5 0 0 1 3 17.5v-11A2.5 2.5 0 0 1 5.5 4Z"/>
+        <rect x="3" y="4" width="18" height="16" rx="2.5"/>
+        <path d="M9 4v16"/>
+      </svg>
+    </button>
+    <!-- Расширения — плагины writer, как в VS Code: панель слева вместо структуры -->
+    <button id="open-extensions" type="button" title="Расширения: плагины"
+            aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="9.5" width="5.5" height="5.5" rx="1"/>
+        <rect x="3.5" y="15" width="5.5" height="5.5" rx="1"/>
+        <rect x="9" y="15" width="5.5" height="5.5" rx="1"/>
+        <rect x="14" y="4" width="5.5" height="5.5" rx="1" transform="rotate(12 16.75 6.75)"/>
+      </svg>
+    </button>
+    <!-- Внизу полосы, как в IDE: проверка орфографии, настройки книги -->
+    <button id="open-spelling" type="button" title="Проверка орфографии: MCP-сервер">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 17 7.5 5h1L13 17M4.6 13h7.3"/>
+        <path d="m14 15 3 3 5-6"/>
+      </svg>
+    </button>
+    <button id="open-settings" type="button" title="Настройки книги">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7h9M17 7h3M4 17h3M11 17h9"/>
+        <circle cx="15" cy="7" r="2"/>
+        <circle cx="9" cy="17" r="2"/>
+      </svg>
+    </button>
+  </nav>
+  <!-- Панель слева: области, как в проводнике VS Code. Щелчок по заголовку сворачивает
+       и разворачивает область -->
+  <aside id="chapters" class="chapters">
+    <section class="view" data-view="chapters">
+      <header>
+        <button type="button" class="view-title" aria-expanded="true">Структура</button>
+        <button id="add-block" type="button" class="view-action" title="Добавить блок"
+                popovertarget="add-menu">+</button>
+      </header>
+      <nav id="tree" class="view-body"></nav>
+    </section>
+    <section class="view" data-view="document">
+      <header>
+        <button type="button" class="view-title" aria-expanded="true">Публикация</button>
+        <button id="import-book" type="button" class="view-action"
+                title="Импортировать книгу из публикации, собранной в GOSTwriter. Текущая книга уйдёт в корзину">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 15v4h14v-4"/></svg>
+        </button>
+        <input id="book-file" type="file" accept=".docx" hidden>
+        <button id="build-document" type="button" class="view-action"
+                title="Собрать публикацию: титульный лист, содержание, блоки по порядку, список источников. Берутся тексты, сохранённые на диске (Ctrl+S)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+        </button>
+      </header>
+      <div id="document" class="view-body"></div>
+    </section>
+    <!-- Расширения: видны вместо структуры и публикации, пока нажата их кнопка -->
+    <section id="extensions-view" class="view" hidden>
+      <header>
+        <span class="view-title">Расширения</span>
+        <button id="import-plugin" type="button" class="view-action"
+                title="Импортировать плагин из архива .zip">+</button>
+        <input id="plugin-file" type="file" accept=".zip,application/zip" hidden>
+      </header>
+      <div id="extensions" class="view-body"></div>
+    </section>
+    <!-- Меню «+» у заголовка «Структура»: какой блок добавить. Введение, заключение и
+         титульный лист — по одному на книгу -->
+    <div id="add-menu" class="menu" popover></div>
+  </aside>
+  <!-- Разделители тянут левой кнопкой мыши: так меняют ширину панели структуры и книги -->
+  <div id="chapters-splitter" class="splitter" title="Потяни, чтобы изменить ширину"></div>
+  <main id="panes">
+    <!-- Слева текст блока — на правку, справа книга или другой материал — на просмотр -->
+    <section id="text" class="pane">
+      <p class="hint">Открой блок в структуре слева или добавь его кнопкой «+»</p>
+      <div id="text-editor"></div>
+    </section>
+    <div id="material-splitter" class="splitter" title="Потяни, чтобы изменить ширину"></div>
+    <section id="material" class="pane" hidden>
+      <div id="material-editor"></div>
+    </section>
+  </main>
+  <!-- Источник для блока: веб-страница по адресу или книга с диска -->
+  <dialog id="disk">
+    <form id="web-form" class="web">
+      <input name="url" type="url" required placeholder="Адрес веб-страницы: https://…">
+      <button>Подключить страницу</button>
+    </form>
+    <header>
+      <button id="disk-up" type="button" title="Папка выше">↑</button>
+      <span id="disk-path"></span>
+    </header>
+    <ul id="disk-list"></ul>
+    <form method="dialog" class="buttons">
+      <button>Отмена</button>
+    </form>
+  </dialog>
+  <!-- Данные источника для ссылок: api распознаёт их в книге или на странице, человек
+       проверяет. Поля книги и страницы — в своих fieldset, видна одна -->
+  <dialog id="source">
+    <form id="source-form">
+      <header>
+        <strong id="source-heading"></strong>
+        <span id="source-file"></span>
+      </header>
+      <div class="fields">
+        <p id="source-warning" class="warning" hidden></p>
+        <label>Авторы
+          <input name="authors" placeholder="Фамилия И. О., Фамилия И. О.">
+        </label>
+        <label>Заглавие
+          <textarea name="title" rows="2" required></textarea>
+        </label>
+        <fieldset id="book-fields" class="fields">
+          <label>Издание
+            <input name="edition" placeholder="2-е изд., испр.">
+          </label>
+          <div class="row">
+            <label>Город <input name="place" placeholder="М."></label>
+            <label class="wide">Издательство <input name="publisher"></label>
+            <label>Год <input name="year" inputmode="numeric"></label>
+          </div>
+          <label>Сдвиг страниц
+            <input name="page_offset" type="number" required>
+            <small>Печатный номер страницы = номер страницы в файле − сдвиг</small>
+          </label>
+        </fieldset>
+        <fieldset id="web-fields" class="fields">
+          <div class="row">
+            <label class="wide">Сайт <input name="site" placeholder="Хабр"></label>
+            <label>Год <input name="year" inputmode="numeric"></label>
+          </div>
+          <label>Адрес <input name="url" readonly></label>
+          <label>Дата обращения
+            <input name="accessed" placeholder="ДД.ММ.ГГГГ">
+            <small>Когда страницу открывали; копия в блоке сохранена в этот день</small>
+          </label>
+        </fieldset>
+      </div>
+      <dl class="preview">
+        <dt>Ссылка в блоке</dt>
+        <dd id="source-link"></dd>
+        <dt id="source-footnote-title"></dt>
+        <dd id="source-footnote"></dd>
+      </dl>
+      <footer class="buttons">
+        <button id="source-cancel" type="button">Отмена</button>
+        <button id="source-submit" class="primary">Подключить</button>
+      </footer>
+    </form>
+  </dialog>
+  <dialog id="settings">
+    <form method="dialog">
+      <header><strong>Настройки книги</strong></header>
+      <div class="fields">
+        <label>Оформление ссылок
+          <select id="style"></select>
+          <small>По этому правилу встают новые сноски, уже вставленные не меняются</small>
+        </label>
+      </div>
+      <footer class="buttons">
+        <button class="primary">Готово</button>
+      </footer>
+    </form>
+  </dialog>
+  <!-- Проверка орфографии: адрес MCP-сервера сохраняется, только когда сервер ответил -->
+  <dialog id="spelling">
+    <form id="spelling-form">
+      <header><strong>Проверка орфографии</strong></header>
+      <div class="fields">
+        <label>MCP-сервер
+          <input name="url" type="url" placeholder="http://сервер:порт/mcp">
+          <small>Адрес, как его видит api из контейнера: localhost там — сам контейнер,
+            этот компьютер — host.docker.internal. Пусто — проверка отключена</small>
+        </label>
+        <p id="spelling-status" hidden></p>
+      </div>
+      <footer class="buttons">
+        <button id="spelling-close" type="button">Закрыть</button>
+        <button class="primary">Подключить</button>
+      </footer>
+    </form>
+  </dialog>
+  <!-- Стрелка у публикации: скачать её, это и есть экспорт книги -->
+  <template id="download-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 15v4h14v-4"/></svg>
+  </template>
+  <!-- Скрепка у блока в дереве: подключить книгу или веб-страницу -->
+  <template id="paperclip">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 11.5 12.3 19.2a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.4 8.4a1.7 1.7 0 0 1-2.4-2.4l7.7-7.7"/>
+    </svg>
+  </template>
+</body>
+</html>

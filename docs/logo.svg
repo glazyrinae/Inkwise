@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="200" height="200" role="img" aria-labelledby="title">
+  <title id="title">GOSTwriter: привидение-гострайтер пишет пером работу по ГОСТ</title>
+  <!-- Лист с текстом и штампом «ГОСТ» -->
+  <g transform="rotate(7 166 132)">
+    <rect x="116" y="58" width="96" height="128" rx="9" fill="#ffffff" stroke="#2b2540" stroke-width="5"/>
+    <path d="M131 84h66M131 101h66M131 118h52M131 135h60" stroke="#c9c2ec" stroke-width="6" stroke-linecap="round"/>
+    <g transform="rotate(-12 180 163)">
+      <rect x="152" y="150" width="56" height="26" rx="6" fill="#fff4f4" stroke="#e5484d" stroke-width="4"/>
+      <text x="180" y="168.5" text-anchor="middle" font-family="Verdana, DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#e5484d" letter-spacing="0.5">ГОСТ</text>
+    </g>
+  </g>
+  <!-- Привидение -->
+  <path d="M30 196 V110 a50 50 0 0 1 100 0 V196 Q117.5 214 105 196 Q92.5 178 80 196 Q67.5 214 55 196 Q42.5 178 30 196 Z" fill="#f5f2ff" stroke="#2b2540" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M42 112 a38 38 0 0 1 30 -36" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
+  <ellipse cx="64" cy="116" rx="7.5" ry="10" fill="#2b2540"/>
+  <ellipse cx="98" cy="116" rx="7.5" ry="10" fill="#2b2540"/>
+  <circle cx="66.5" cy="111.5" r="2.8" fill="#ffffff"/>
+  <circle cx="100.5" cy="111.5" r="2.8" fill="#ffffff"/>
+  <ellipse cx="52" cy="134" rx="8" ry="4.5" fill="#ff9fbd" opacity="0.75"/>
+  <ellipse cx="110" cy="134" rx="8" ry="4.5" fill="#ff9fbd" opacity="0.75"/>
+  <path d="M72 134 q9 9 18 0" fill="none" stroke="#2b2540" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Перо в руке: пишет по листу -->
+  <g transform="rotate(38 166 132)">
+    <rect x="160" y="62" width="14" height="62" rx="7" fill="#6e56ff" stroke="#2b2540" stroke-width="4"/>
+    <rect x="160" y="104" width="14" height="7" fill="#f2c94c" stroke="#2b2540" stroke-width="3"/>
+    <path d="M160 122 L167 146 L174 122 Z" fill="#dcd7f5" stroke="#2b2540" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M167 128 V140" stroke="#2b2540" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <path d="M126 150 q14 -14 26 -6 q8 6 -2 14 q-12 9 -24 6" fill="#f5f2ff" stroke="#2b2540" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

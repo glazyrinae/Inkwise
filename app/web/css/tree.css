@@ -1,0 +1,239 @@
+/* Панель слева: области «Структура» и «Публикация», как в проводнике VS Code. Ширину
+   панели меняет разделитель справа от неё */
+.chapters {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 260px;
+  min-width: 160px;
+  max-width: 50vw;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+/* Область: заголовок и под ним содержимое со своей прокруткой. Развёрнутая структура
+   занимает всё место, и область публикации прижата к низу панели */
+.view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.view[data-view="chapters"]:not(.collapsed) {
+  flex: 1;
+}
+
+.view + .view {
+  border-top: 1px solid var(--line);
+}
+
+.view > header {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+/* Заголовок области — кнопка во всю ширину: щелчок сворачивает и разворачивает */
+.view-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.view-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* У свёрнутой области виден только заголовок */
+.view.collapsed > .view-body,
+.view.collapsed .view-action {
+  display: none;
+}
+
+/* «+» у заголовка открывает меню блоков, галка собирает публикацию; у блока и
+   заголовка в нём кнопки видны под мышью */
+.view-action,
+.chapters .action {
+  flex: none;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.view-action {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.view-action svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: -2px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.view-action:hover,
+.chapters .action:hover {
+  background: var(--hover);
+  color: var(--accent);
+}
+
+.chapters .action.remove:hover {
+  color: #c62828;
+}
+
+/* Кнопки видны только у строки под мышью: у каждой строки сразу они бы рябили. Без
+   них название занимает всю ширину строки, как в VS Code */
+.chapters .action {
+  display: none;
+}
+
+.chapters .row:hover > .action {
+  display: inline-block;
+}
+
+.chapters .action svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Строка блока, заголовка и файла: название во всю ширину, кнопки справа */
+.chapters .row {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+/* Своя стрелка: у summary с display: flex стандартной нет. Та же стрелка у заголовка
+   области */
+.chapters summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.chapters summary::before,
+.view-title::before {
+  content: "▸";
+  flex: none;
+  width: 18px;
+  color: var(--muted);
+  text-align: center;
+  transition: transform 0.1s;
+}
+
+.chapters details[open] > summary::before,
+.view-title[aria-expanded="true"]::before {
+  transform: rotate(90deg);
+}
+
+/* Пустому блоку сворачивать нечего */
+.chapters .leaf > summary::before {
+  visibility: hidden;
+}
+
+/* Заголовки и материалы — с отступом под своим блоком */
+.chapters .body {
+  padding-left: 14px;
+}
+
+/* Название блока открывает его текст, заголовок — место в тексте, имя файла — файл */
+.chapters .title,
+.chapters .file {
+  flex: 1;
+  min-width: 0;
+  padding: 4px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Имя файла — вровень с названиями рядом: перед ними ещё стрелка */
+.chapters .file {
+  padding-left: 22px;
+}
+
+.chapters button.title:hover,
+.chapters .file:hover {
+  background: var(--hover);
+}
+
+.chapters .open,
+.chapters .open:hover {
+  background: #dbe7fb;
+}
+
+/* Пустая область: подсказка, как её заполнить */
+.chapters .empty {
+  margin: 0;
+  padding: 2px 8px 8px 22px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Блок перетаскивают за строку: полоса показывает, куда он встанет */
+.chapters .drop-before {
+  box-shadow: inset 0 2px var(--accent);
+}
+
+.chapters .drop-after {
+  box-shadow: inset 0 -2px var(--accent);
+}
+
+/* Меню «+»: какой блок добавить. Встаёт под кнопкой, место ставит shell.js */
+.menu {
+  position: fixed;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  padding: 5px 14px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  text-align: left;
+}
+
+.menu button:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.menu button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}

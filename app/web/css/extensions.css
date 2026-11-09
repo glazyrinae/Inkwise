@@ -1,0 +1,123 @@
+/* Панель «Расширения»: плагины карточками, как в VS Code */
+#extensions-view {
+  flex: 1;
+  border-top: 0;
+}
+
+/* Заголовок области «Расширения» не сворачивает её: стрелки у него нет */
+#extensions-view .view-title {
+  padding-left: 8px;
+}
+
+#extensions-view .view-title::before {
+  content: none;
+}
+
+/* Колонка карточки — по ширине панели: длинное имя файла не распирает её */
+.plugin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.plugin header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.plugin .version,
+.plugin p,
+.plugin label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plugin p {
+  margin: 0;
+}
+
+.plugin .warning {
+  color: #8a4b00;
+}
+
+/* Что плагин прочитал или сообщает о себе: строками, как он их написал */
+.plugin .details {
+  white-space: pre-line;
+  color: inherit;
+}
+
+/* Файл настройки: имя файла и кнопки в одну строку */
+.plugin .file-setting {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plugin .file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plugin .file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #222;
+  font-size: 13px;
+}
+
+.plugin .file-row button {
+  flex: none;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+}
+
+.plugin label {
+  display: grid;
+  gap: 3px;
+}
+
+/* Галка «Включён в этой книге» — в строку и цветом основного текста */
+.plugin .switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  font-size: 13px;
+}
+
+.plugin select {
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  color: #222;
+}
+
+.plugin .remove {
+  justify-self: end;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+}
+
+.plugin .remove:hover {
+  border-color: #c62828;
+  color: #c62828;
+}

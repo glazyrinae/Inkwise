@@ -1,0 +1,67 @@
+# Базовый набор сервисов: всегда вместе с оверлеем docker-compose.$RUN_MODE.yml,
+# см. Makefile.
+services:
+  # Оболочка в браузере и связка с редактором: папка книги, конфиг редактора, приём
+  # сохранённых файлов
+  api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: prod
+      network: host
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    user: "${UID:-1000}:${GID:-1000}"
+    env_file:
+      - path: .env
+    environment:
+      # Адрес редактора для браузера: из того же OFFICE_PORT, на котором его
+      # публикует office
+      OFFICE__PUBLIC_URL: "http://localhost:${OFFICE_PORT:-8021}"
+      BOOK__LIBRARY: ${LIBRARY_DIR:-${HOME}}
+    volumes:
+      # Папка книги с хоста; путь в контейнере — [book] root в config.toml
+      - ${BOOK_DIR:-./deploy/book}:/app/book
+      # Плагины, как расширения VS Code; путь в контейнере — [plugins] root
+      - ${PLUGINS_DIR:-./plugins}:/app/plugins
+      # Шрифты для office: каких в нём нет, api скачивает сюда; путь — [fonts] root
+      - ${FONTS_DIR:-./deploy/fonts}:/app/fonts
+      # Библиотека — где лежат книги-источники, только на чтение. Путь в контейнере тот
+      # же, что на хосте: ссылка на книгу в папке главы ведёт к ней и здесь, и в
+      # файловом менеджере
+      - ${LIBRARY_DIR:-${HOME}}:${LIBRARY_DIR:-${HOME}}:ro
+      # Часовой пояс хоста: по нему время в именах папок корзины и дата обращения к
+      # веб-странице, иначе в контейнере UTC
+      - /etc/localtime:/etc/localtime:ro
+    # MCP-сервер проверки орфографии на этом же компьютере api находит по имени
+    # host.docker.internal: localhost в контейнере — сам контейнер
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # ONLYOFFICE Docs — сам редактор. Файл скачивает у api по ссылке из конфига
+  # редактора, сохранённый отдаёт api через callback
+  office:
+    image: onlyoffice/documentserver:10.0.0
+    environment:
+      # Тот же секрет читает api: подписывает им конфиг редактора и проверяет callback
+      JWT_SECRET: ${OFFICE__JWT_SECRET}
+      # api в сети compose — приватный адрес, а к таким office по умолчанию не ходит
+      ALLOW_PRIVATE_IP_ADDRESS: "true"
+    ports:
+      # Редактор браузер грузит прямо с office
+      - "127.0.0.1:${OFFICE_PORT:-8021}:80"
+    # Рядом со штатным запуском office — сторож папки шрифтов: новый шрифт office
+    # ставит сам, см. deploy/office/fonts-watch.sh
+    entrypoint:
+      - /bin/sh
+      - -c
+      - /usr/local/bin/writer-fonts-watch.sh & exec /app/ds/run-document-server.sh
+    volumes:
+      # Плагин «Цитата»: office отдаёт его со своего адреса, как и свои плагины. Путь
+      # sdkjs-plugins/writer — тот же, что в app/service/office.py
+      - ./app/plugin:/var/www/onlyoffice/documentserver/sdkjs-plugins/writer:ro
+      # Шрифты, скачанные api: custom-fonts office читает, когда собирает свой список
+      # шрифтов
+      - ${FONTS_DIR:-./deploy/fonts}:/var/www/onlyoffice/Data/custom-fonts:ro
+      - ./deploy/office/fonts-watch.sh:/usr/local/bin/writer-fonts-watch.sh:ro
+    restart: unless-stopped

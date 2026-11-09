@@ -1,0 +1,9 @@
+# Прод: код внутри образа.
+services:
+  api:
+    image: writer:prod
+    environment:
+      # Без отладки: FastAPI не отдаёт клиентам traceback ошибок
+      APP__DEBUG: "false"
+    ports:
+      - "127.0.0.1:${API_PORT:-8020}:8000"

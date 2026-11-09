@@ -1,0 +1,64 @@
+/* Окно выбора источника: адрес веб-страницы сверху, под ним папки библиотеки */
+#disk {
+  width: min(560px, 90vw);
+}
+
+#disk header,
+#disk .web {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+#disk .web input {
+  flex: 1;
+  min-width: 0;
+}
+
+#disk .web button,
+#disk-up {
+  padding: 4px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+#disk-up {
+  padding: 2px 10px;
+}
+
+#disk-path {
+  word-break: break-all;
+  color: var(--muted);
+}
+
+#disk-list {
+  height: min(55vh, 440px);
+  margin: 0;
+  padding: 4px 0;
+  overflow: auto;
+  list-style: none;
+}
+
+#disk-list .file {
+  display: block;
+  width: 100%;
+  padding: 3px 14px;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#disk-list .file:hover {
+  background: var(--hover);
+}
+
+#disk-list .empty {
+  padding: 12px 14px;
+  color: var(--muted);
+}
