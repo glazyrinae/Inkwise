@@ -1,11 +1,10 @@
-[![GOSTwriter: привидение-гострайтер пишет пером работу по ГОСТ](docs/logo.svg)](docs/logo.svg)
+[![GOSTwriter mascot: a friendly ghostwriter with a pen](docs/logo.svg)](docs/logo.svg)
 
 GOSTwriter
 ==========
 
-**Пишешь ты — по ГОСТ оформляет GOSTwriter.** Курсовая, диплом, отчёт или книга прямо в браузере: цитаты со сносками в один клик, оформление по образцу и сборка всей работы в один DOCX.
+**You write — your ghostwriter takes care of the formalities.** A smart browser editor for books, papers, reports and notes: structure, citations, styles and formatting standards are handled for you, and the whole work compiles into a single DOCX.
 
-[![ГОСТ](https://img.shields.io/badge/%D0%93%D0%9E%D0%A1%D0%A2-7.32%E2%80%932017%20%C2%B7%20%D0%A0%207.0.5%E2%80%932008-E5484D)](#что-умеет)
 [![ONLYOFFICE Docs](https://img.shields.io/badge/ONLYOFFICE_Docs-10.0-FF6F3D?logo=onlyoffice&logoColor=white)](https://www.onlyoffice.com/docs)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.162-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -19,38 +18,42 @@ GOSTwriter
 [![Last commit](https://img.shields.io/github/last-commit/glazyrinae/GOSTwriter)](https://github.com/glazyrinae/GOSTwriter/commits/main)
 [![Repo size](https://img.shields.io/github/repo-size/glazyrinae/GOSTwriter)](https://github.com/glazyrinae/GOSTwriter)
 
-## Что умеет
+## Features
 
-- 🧱 **Структура по ГОСТ 7.32** — титульный лист, введение, разделы, заключение. Разделы и подразделы нумеруются сами, порядок меняют перетаскиванием.
-- ✍️ **Редактор как Word** — ONLYOFFICE в браузере: таблицы, формулы, сноски, проверка орфографии.
-- 📚 **Цитата со сноской в один клик** — выделил фразу в книге или на веб-странице, и в тексте цитата со сноской по ГОСТ Р 7.0.5 с номером страницы.
-- 🎨 **Оформление по образцу** — загрузи PDF или Word, оформленный как надо: поля, шрифт, интервалы и заголовки перейдут в работу, недостающий шрифт скачается из Google Fonts.
-- 📦 **Сборка в один DOCX** — титульный лист, содержание с номерами страниц, все разделы и список использованных источников.
-- 🔄 **Экспорт и импорт** — тексты, данные источников и настройки едут внутри собранного DOCX: отправил файл, на другом компьютере импортировал. Книги из библиотеки остаются ссылками.
+- 🧱 **Structured writing** — a work is a tree of blocks: title page, introduction, chapters, conclusion, your own parts. Chapters and sections are numbered automatically; reorder them by drag and drop.
+- ✍️ **A real word processor** — ONLYOFFICE right in the browser: tables, equations, footnotes, spell checking.
+- 📚 **Citations in one click** — select a sentence in a book or web page, and it lands in your text as a quote with a properly formatted footnote, page number included.
+- 📐 **Standards built in** — style presets for a scientific article, a research report (GOST 7.32) and APA 7th edition; footnotes follow the citation rule chosen in the book settings.
+- 🎨 **Style from a sample** — upload a PDF or Word file formatted the way you need: margins, fonts, spacing and headings become your template, missing fonts are downloaded from Google Fonts.
+- 📦 **One-click compile** — title page, table of contents with page numbers, all chapters and the reference list in one DOCX.
+- 🔄 **Export and import** — texts, source data and settings travel inside the compiled DOCX: send the file, import it on another computer. Library books stay as links.
+- 🧩 **Plugins** — extensions panel like in VS Code.
 
-## Как это выглядит
+## See it in action
 
-### Цитата со сноской
+The interface is in Russian for now.
 
-Книга открыта рядом с текстом. Выделяешь фразу, правый клик, «Цитировать» — цитата встаёт в текст, а сноска внизу страницы: автор, заглавие, издательство, год и страница.
+### Quote with a footnote
 
-![Цитата из книги со сноской по ГОСТ](docs/demo-quote.gif)
+A book is open next to your text. Select a sentence, right-click, «Цитировать» (Quote) — the quote goes into the text, and the footnote at the bottom of the page gets the author, title, publisher, year and page.
 
-### Оформление по образцу
+![Quoting a book with an automatic footnote](docs/demo-quote.gif)
 
-В «Расширениях» загружаешь образец, например статью из журнала в PDF. GOSTwriter читает в нём лист, поля, шрифт, кегль, интервалы, заголовки и номер страницы и собирает работу так же.
+### Style from a sample
 
-![Образец в PDF — и работа пересобрана в его оформлении](docs/demo-sample.gif)
+In the extensions panel, upload a sample — for example, a journal article as a PDF. GOSTwriter reads the page size, margins, font, size, spacing, headings and page numbers, and the work is rebuilt in the same style.
 
-### Сборка работы
+![A PDF sample, and the work rebuilt in its style](docs/demo-sample.gif)
 
-Галка в заголовке «Публикация» — и вся работа в одном DOCX: титульный лист, содержание с отточием и номерами страниц, разделы, таблицы, сноски, список источников.
+### Compile the work
 
-![Сборка работы в один DOCX по ГОСТ](docs/demo-build.gif)
+One click on the check mark in «Публикация» (Publication) — and the whole work is a single DOCX: title page, table of contents with page numbers, chapters, tables, footnotes and the reference list.
 
-## Как запустить
+![Compiling the work into one DOCX](docs/demo-build.gif)
 
-Нужны Docker с Compose и `make`. Проверено на Linux (Ubuntu). На macOS и Windows нужен Docker Desktop, там не проверяли.
+## Getting started
+
+You need Docker with Compose and `make`. Tested on Linux (Ubuntu); on macOS and Windows use Docker Desktop (not tested there yet).
 
 ```bash
 git clone https://github.com/glazyrinae/GOSTwriter.git
@@ -58,25 +61,25 @@ cd GOSTwriter
 make init
 ```
 
-`make init` создаст файл настроек `.env` (секрет и права впишет сам), соберёт приложение, скачает редактор ONLYOFFICE и запустит всё. Первый раз это занимает несколько минут: образы весят около 3,5 ГБ.
+`make init` creates the `.env` settings file (it fills in the secret and file permissions itself), builds the app, downloads the ONLYOFFICE editor and starts everything. The first run takes a few minutes: the images are about 3.5 GB.
 
-Открой **http://localhost:8020**. При первом запуске редактор готовится ещё минуту-две, пока ONLYOFFICE собирает шрифты: если текст не открылся, обнови страницу чуть позже.
+Open **http://localhost:8020**. On the very first start the editor needs another minute or two while ONLYOFFICE prepares its fonts — if a text doesn't open, reload the page a bit later.
 
-## Первые шаги
+## First steps
 
-1. **«+»** в заголовке «Структура» — добавь титульный лист, введение, разделы и заключение. Текст блока сразу откроется в редакторе.
-2. **Скрепка** у блока — подключи книгу из своей папки (PDF, DJVU, EPUB…) или веб-страницу по адресу. Данные для сноски GOSTwriter ищет в самой книге — проверь и поправь их в форме.
-3. **Щелчок по книге** в структуре откроет её справа. Выдели фразу → правый клик → **«Цитировать»**.
-4. **Галка** в заголовке «Публикация» соберёт работу, **стрелка** у строки скачает DOCX.
+1. **«+»** next to «Структура» (Structure) — add a title page, introduction, chapters and conclusion. The text of a block opens in the editor right away.
+2. **Paperclip** next to a block — attach a book from your folder (PDF, DJVU, EPUB…) or a web page by its address. GOSTwriter looks for the citation data in the book itself — check and fix it in the form.
+3. **Click the book** in the tree to open it on the right. Select a sentence → right-click → **«Цитировать»**.
+4. **Check mark** next to «Публикация» compiles the work, the **arrow** next to it downloads the DOCX.
 
-## Полезно знать
+## Good to know
 
-- Работа лежит в папке `deploy/book`: блок — папка, текст — обычный `.docx`. Другую папку задаёт `BOOK_DIR` в `.env`.
-- Книги для цитат GOSTwriter берёт из домашней папки и только читает их. Другую папку задаёт `LIBRARY_DIR` в `.env`.
-- Остановить — `make compose-down`, запустить снова — `make compose-up`, обновить — `git pull && make init`.
-- Всё работает на твоём компьютере: порты 8020 (GOSTwriter) и 8021 (редактор) открыты только для него.
-- Редактор — [ONLYOFFICE Docs](https://github.com/ONLYOFFICE/DocumentServer) Community Edition (AGPL v3), его образ скачивается с Docker Hub.
+- Your work lives in `deploy/book`: a block is a folder, a text is a plain `.docx`. Set another folder with `BOOK_DIR` in `.env`.
+- Books for citations are taken from your home folder, read-only. Set another folder with `LIBRARY_DIR` in `.env`.
+- Stop — `make compose-down`, start again — `make compose-up`, update — `git pull && make init`.
+- Everything runs on your computer: ports 8020 (GOSTwriter) and 8021 (editor) are open to it only.
+- The editor is [ONLYOFFICE Docs](https://github.com/ONLYOFFICE/DocumentServer) Community Edition (AGPL v3); its image is pulled from Docker Hub.
 
-## Для разработчиков
+## For developers
 
-Как всё устроено — в [CLAUDE.md](CLAUDE.md), как писать плагины — в [PLUGINS.md](PLUGINS.md).
+How everything works — [CLAUDE.md](CLAUDE.md) (in Russian), how to write plugins — [PLUGINS.md](PLUGINS.md).
