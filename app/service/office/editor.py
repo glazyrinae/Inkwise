@@ -13,6 +13,7 @@ from urllib.parse import quote, urlencode
 import jwt
 
 from app.service.book import blocks, paths, trash
+from app.service.language import t
 from app.service.office import formats
 from app.settings.config import config
 
@@ -58,17 +59,17 @@ def config_for(path: str) -> dict[str, Any]:
         "documentType": formats.EDITOR_TYPES[extension],
         "editorConfig": {
             "mode": "edit" if editable else "view",
-            "lang": "ru",
+            "lang": config.app.language,
             # Время открытия: если блок унесут в корзину, правки лягут в его копию
             # там, даже когда на его месте уже другой блок — см. callback.py
             "callbackUrl": f"{config.office.api_url}/api/office/callback?"
             + urlencode({"path": path, "opened": trash.stamp()}),
-            "user": {"id": "author", "name": config.office.author},
+            "user": {"id": "author", "name": t(config.office.author)},
             "customization": {
                 "forcesave": True,
                 # Книгу рядом с текстом закрывают крестиком в заголовке редактора,
                 # оболочка ловит его как onRequestClose
-                "close": {"visible": not editable, "text": "Закрыть"},
+                "close": {"visible": not editable, "text": t("Закрыть")},
             },
             # В книге плагин даёт «Цитировать», в тексте вставляет цитату со сноской
             "plugins": {"pluginsData": [_plugin_url()], "autostart": [PLUGIN_GUID]},

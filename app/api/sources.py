@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from pydantic import AnyHttpUrl, BaseModel, Field
 
 from app.service.book import materials, paths
+from app.service.language import t
 from app.service.sources import recognize, store, styles, web, web_copy
 from app.service.sources.models import Source, WebPage
 
@@ -69,7 +70,10 @@ def read_web_source(url: AnyHttpUrl) -> SourceView:
     try:
         address, page = web.download(address)
     except web.PageError as error:
-        page, warning = None, f"Страница не скачалась: {error}. Данные впиши сам."
+        page, warning = (
+            None,
+            t("Страница не скачалась: {error}. Данные впиши сам.", error=error),
+        )
     source = store.saved(address) or web.recognize(address, page)
     return view(source, web_copy.SUFFIX, warning)
 

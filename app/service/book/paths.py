@@ -7,12 +7,19 @@
 import os
 from pathlib import Path
 
+from app.service.language import t
 from app.settings.config import config
 
 
 def root() -> Path:
     """Корень книги."""
     return config.book.root.resolve()
+
+
+def publication() -> Path:
+    """Файл публикации в корне книги. Имя — на языке интерфейса: «Публикация.docx»,
+    «Publication.docx»."""
+    return root() / t(config.book.document)
 
 
 def in_book(path: str) -> Path:

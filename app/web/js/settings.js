@@ -2,6 +2,7 @@
 // меняют настройки книги, а api сохраняет их целиком
 
 import { query, request, send, showError } from "./http.js";
+import { t } from "./i18n.js";
 
 const settingsDialog = document.getElementById("settings");
 const styleSelect = document.getElementById("style");
@@ -43,13 +44,15 @@ async function save(change) {
 async function connect(url) {
   if (!url) {
     await save({ mcp_url: null });
-    showStatus("Проверка орфографии отключена");
+    showStatus(t("Проверка орфографии отключена"));
     return;
   }
-  showStatus("Подключаюсь…");
+  showStatus(t("Подключаюсь…"));
   const tools = await request(`/api/spelling/tools${query({ url })}`);
   await save({ mcp_url: url });
-  showStatus(`Подключено. Инструменты сервера: ${tools.join(", ") || "нет"}`);
+  showStatus(
+    t("Подключено. Инструменты сервера: {tools}", { tools: tools.join(", ") || t("нет") }),
+  );
 }
 
 function showStatus(text, warning = false) {

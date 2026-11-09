@@ -7,6 +7,7 @@
 
 import * as editors from "./editors.js";
 import { send, showError } from "./http.js";
+import { t } from "./i18n.js";
 
 let chapterPlugin = null; // окно плагина в редакторе текста: плагин сообщает о себе сам
 const waiting = {}; // кто ждёт сообщения плагина текста: его тип → список resolve
@@ -66,7 +67,7 @@ function pluginReady() {
 
 async function cite({ text, page }) {
   if (!editors.openPath("text") || !pluginReady()) {
-    throw new Error("Открой текст блока слева: цитата встанет туда, где курсор");
+    throw new Error(t("Открой текст блока слева: цитата встанет туда, где курсор"));
   }
   editors.focusText();
   const quote = await send("POST", "/api/book/quote", {
@@ -94,7 +95,7 @@ function chapterMessage(writer) {
     };
     const timer = setTimeout(() => {
       waiting[writer] = waiting[writer]?.filter((other) => other !== done);
-      reject(new Error("Текст блока не отвечает: обнови страницу и попробуй ещё раз"));
+      reject(new Error(t("Текст блока не отвечает: обнови страницу и попробуй ещё раз")));
     }, 60000);
     (waiting[writer] ??= []).push(done);
   });

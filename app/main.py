@@ -23,6 +23,7 @@ from app.api import (
     spelling,
     transfer,
 )
+from app.service.language import t
 from app.service.office.formats import UnsupportedFileError
 from app.service.plugins import PluginError
 from app.settings.config import config
@@ -98,7 +99,7 @@ def _answer(status: int, text: str) -> Callable[[Request, Exception], JSONRespon
             # Ошибка самой ОС: в ней полный путь в контейнере, человеку хватит имени.
             # У symlink и rename нужный файл — второй: куда, а не откуда
             subject = Path(error.filename2 or error.filename).name
-        return JSONResponse({"detail": f"{text}: {subject}"}, status_code=status)
+        return JSONResponse({"detail": f"{t(text)}: {subject}"}, status_code=status)
 
     return answer
 

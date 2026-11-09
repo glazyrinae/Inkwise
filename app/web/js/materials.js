@@ -7,6 +7,7 @@ import { query, request, send, showError } from "./http.js";
 import { chooseSource } from "./library.js";
 import { closeSource, fileName, showSource } from "./source-form.js";
 import { action, folding, showBook } from "./tree.js";
+import { t } from "./i18n.js";
 
 // Скрепка у блока: книга с диска или веб-страница; подключённое сразу открывается справа
 export async function attachSource(block) {
@@ -19,7 +20,7 @@ export async function attachSource(block) {
 // «✎» у материала: правка данных источника; ссылка получает имя по новым данным
 export async function editSource(path) {
   const view = await request(`/api/book/source${query({ path })}`);
-  showSource(path, view, "Сохранить", async (source) => {
+  showSource(path, view, t("Сохранить"), async (source) => {
     const renamed = await send("PUT", `/api/book/source${query({ path })}`, source);
     closeSource();
     await showBook();
@@ -39,13 +40,16 @@ export async function removeMaterial(block, path) {
     count = await countNotes(material, false);
   }
   const lines = [
-    `Убрать «${fileName(path)}» из блока?`,
-    material.link ? "Сама книга останется на диске." : "Файл удалится из папки блока.",
+    t("Убрать «{file}» из блока?", { file: fileName(path) }),
+    material.link ? t("Сама книга останется на диске.") : t("Файл удалится из папки блока."),
   ];
   if (count) {
     lines.push(
-      `Сносок на этот источник в тексте блока: ${count}. Они тоже удалятся, текст ` +
-        "цитат останется.",
+      t(
+        "Сносок на этот источник в тексте блока: {count}. Они тоже удалятся, текст " +
+          "цитат останется.",
+        { count },
+      ),
     );
   }
   if (!confirm(lines.join("\n\n"))) return;
@@ -61,7 +65,7 @@ export function sourcesItem(block) {
   row.className = "row";
   const title = document.createElement("span");
   title.className = "title";
-  title.textContent = `Источники (${block.materials.length})`;
+  title.textContent = t("Источники ({count})", { count: block.materials.length });
   row.append(title);
   const files = block.materials.map((path) => materialRow(block, path));
   return folding(`${block.path}/источники`, row, files);
@@ -79,8 +83,8 @@ function materialRow(block, path) {
   row.className = "row";
   row.append(
     open,
-    action("edit", "✎", "Данные источника для ссылок", () => editSource(path)),
-    action("remove", "✕", "Убрать из блока", () => removeMaterial(block, path)),
+    action("edit", "✎", t("Данные источника для ссылок"), () => editSource(path)),
+    action("remove", "✕", t("Убрать из блока"), () => removeMaterial(block, path)),
   );
   return row;
 }

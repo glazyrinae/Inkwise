@@ -7,6 +7,7 @@ from fastapi import APIRouter, Header, HTTPException, Request
 from starlette.concurrency import run_in_threadpool
 
 from app.service import fonts, plugins
+from app.service.language import t
 
 router = APIRouter(tags=["plugins"])
 
@@ -37,7 +38,7 @@ async def import_plugin(
     выполнит api.
     """
     if content_type != "application/zip":
-        raise HTTPException(status_code=415, detail="Нужен архив .zip")
+        raise HTTPException(status_code=415, detail=t("Нужен архив .zip"))
     try:
         return plugins.install(await request.body())
     except ValueError as error:

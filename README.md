@@ -31,7 +31,7 @@ Inkwise
 
 ## See it in action
 
-The interface is in Russian for now.
+The animations show the Russian interface; the same screens are available in English.
 
 ### Quote with a footnote
 
@@ -58,19 +58,19 @@ You need Docker with Compose and `make`. Tested on Linux (Ubuntu); on macOS and 
 ```bash
 git clone https://github.com/glazyrinae/Inkwise.git
 cd Inkwise
-make init
+make init language=en
 ```
 
-`make init` creates the `.env` settings file (it fills in the secret and file permissions itself), builds the app, downloads the ONLYOFFICE editor and starts everything. The first run takes a few minutes: the images are about 3.5 GB.
+`make init` creates the `.env` settings file (it fills in the secret and file permissions itself, `language=en` gives the English interface, `language=ru` — Russian, the default), builds the app, downloads the ONLYOFFICE editor and starts everything. The first run takes a few minutes: the images are about 3.5 GB.
 
 Open **http://localhost:8020**. On the very first start the editor needs another minute or two while ONLYOFFICE prepares its fonts — if a text doesn't open, reload the page a bit later.
 
 ## First steps
 
-1. **«+»** next to «Структура» (Structure) — add a title page, introduction, chapters and conclusion. The text of a block opens in the editor right away.
+1. **«+»** next to «Structure» — add a title page, introduction, chapters and conclusion. The text of a block opens in the editor right away.
 2. **Paperclip** next to a block — attach a book from your folder (PDF, DJVU, EPUB…) or a web page by its address. Inkwise looks for the citation data in the book itself — check and fix it in the form.
-3. **Click the book** in the tree to open it on the right. Select a sentence → right-click → **«Цитировать»**.
-4. **Check mark** next to «Публикация» compiles the work, the **arrow** next to it downloads the DOCX.
+3. **Click the book** in the tree to open it on the right. Select a sentence → right-click → **«Quote»**.
+4. **Check mark** next to «Publication» compiles the work, the **arrow** next to it downloads the DOCX.
 
 ## Good to know
 

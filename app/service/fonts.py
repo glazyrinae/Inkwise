@@ -20,6 +20,7 @@ from docx.oxml import parse_xml
 from docx.oxml.ns import qn
 
 from app.service.book import paths
+from app.service.language import t
 from app.settings.config import config
 
 # Список шрифтов office: строки «["Times New Roman",0,0,…]» в его AllFonts.js
@@ -57,9 +58,12 @@ def install(template: Path) -> list[str]:
     unknown = [name for name, key in wanted.items() if key in missing - catalog.keys()]
     if unknown:
         raise FontError(
-            f"Шрифта нет ни в office, ни в Google Fonts: {', '.join(sorted(unknown))}. "
-            "Его файлы .ttf или .otf можно положить в папку шрифтов Inkwise "
-            "(FONTS_DIR), office поставит их сам, — и загрузить образец снова"
+            t(
+                "Шрифта нет ни в office, ни в Google Fonts: {fonts}. Его файлы .ttf "
+                "или .otf можно положить в папку шрифтов Inkwise (FONTS_DIR), office "
+                "поставит их сам, — и загрузить образец снова",
+                fonts=", ".join(sorted(unknown)),
+            )
         )
     downloaded = []
     for key in sorted(missing):
@@ -101,7 +105,7 @@ def _rename(template: Path, names: dict[str, str]) -> None:
 def _office() -> list[str]:
     """Шрифты, которые знает office."""
     url = f"{config.office.internal_url}/sdkjs/common/AllFonts.js"
-    text = _get(url, "Office не отдал список шрифтов").text
+    text = _get(url, t("Office не отдал список шрифтов")).text
     return OFFICE_FONT.findall(text.split('window["__fonts_infos"]', 1)[-1])
 
 
@@ -114,7 +118,7 @@ def _downloaded() -> list[str]:
 
 def _catalog() -> dict[str, dict[str, Any]]:
     """Каталог Google Fonts: ключ имени → семейство с его начертаниями и алфавитами."""
-    text = _get(CATALOG, "Google Fonts не отдал каталог шрифтов").text
+    text = _get(CATALOG, t("Google Fonts не отдал каталог шрифтов")).text
     # Перед JSON — «)]}'»: так Google защищает ответ от чтения чужими страницами
     data = json.loads(text[text.index("{") :])
     return {_key(family["family"]): family for family in data["familyMetadataList"]}
@@ -131,12 +135,13 @@ def _download(family: dict[str, Any]) -> None:
     }
     # Программе, а не браузеру, Google Fonts отдаёт TTF — их и читает office. Браузеру
     # он отдал бы WOFF2, поэтому строка браузера из [web] здесь не годится
-    css = _get(CSS, f"Google Fonts не отдал шрифт {name}", params).text
+    failure = t("Google Fonts не отдал шрифт {name}", name=name)
+    css = _get(CSS, failure, params).text
     faces = FACE.findall(css)
     if not faces:
-        raise FontError(f"У шрифта {name} в Google Fonts нет файлов TTF")
+        raise FontError(t("У шрифта {name} в Google Fonts нет файлов TTF", name=name))
     for style, weight, url in faces:
-        data = _get(url, f"Google Fonts не отдал шрифт {name}").content
+        data = _get(url, failure).content
         suffix = "i" if style == "italic" else ""
         paths.replace(config.fonts.root / f"{name} {weight}{suffix}.ttf", data)
 

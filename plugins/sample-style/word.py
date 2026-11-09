@@ -22,6 +22,7 @@ from docx.shared import Length
 
 from .pdf import FIGURE, NUMBER, REFERENCES, SINGLE, TABLE
 from .style import Style, Text, interval, sheet
+from .words import t
 
 MM = 25.4 / 1440  # миллиметров в twip
 ALIGN = {"both": "both", "distribute": "both", "center": "center", "right": "right"}
@@ -45,7 +46,7 @@ def read(path: Path) -> Style:
     try:
         document = docx.Document(str(path))
     except (PackageNotFoundError, KeyError, ValueError):
-        raise ValueError("Файл не открылся как документ Word .docx") from None
+        raise ValueError(t("Файл не открылся как документ Word .docx")) from None
     styles = _Styles(document)
     # Оформление по видам абзацев; вес — число знаков, как в PDF
     kinds: dict[str, Counter[Text]] = defaultdict(Counter)
@@ -69,11 +70,11 @@ def read(path: Path) -> Style:
         kinds["footnote"][look] += 1
     body = _common(kinds["body"])
     if body is None:
-        raise ValueError("В документе Word не нашлось основного текста")
+        raise ValueError(t("В документе Word не нашлось основного текста"))
     notes = []
     sections = document.sections
     if any(section._sectPr.xpath("w:cols[@w:num > 1]") for section in sections):
-        notes.append("Образец набран в колонки, шаблон — в одну")
+        notes.append(t("Образец набран в колонки, шаблон — в одну"))
     section = sections[0]
     # Без размеров в документе Word берёт A4 и поля 2 см
     page = (_mm(section.page_width, 210), _mm(section.page_height, 297))

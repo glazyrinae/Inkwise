@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.service import spelling
 from app.service.book import settings
+from app.service.language import t
 
 router = APIRouter(tags=["spelling"])
 
@@ -22,7 +23,7 @@ async def read_tools(url: str) -> list[str]:
         return await spelling.tools(url)
     except spelling.ServerError as error:
         raise HTTPException(
-            status_code=502, detail=f"MCP-сервер не подключился: {error}"
+            status_code=502, detail=t("MCP-сервер не подключился: {error}", error=error)
         ) from None
 
 
@@ -37,18 +38,22 @@ async def check_spelling(request: SpellingRequest) -> None:
     if not url:
         raise HTTPException(
             status_code=409,
-            detail="MCP-сервер не подключён: кнопка «Проверка орфографии» слева внизу",
+            detail=t(
+                "MCP-сервер не подключён: кнопка «Проверка орфографии» слева внизу"
+            ),
         )
     try:
         tools = await spelling.tools(url)
     except spelling.ServerError as error:
         raise HTTPException(
-            status_code=502, detail=f"MCP-сервер не отвечает: {error}"
+            status_code=502, detail=t("MCP-сервер не отвечает: {error}", error=error)
         ) from None
     raise HTTPException(
         status_code=501,
-        detail=(
-            f"Проверка орфографии ещё не сделана. Текст дошёл: {len(request.text)} "
-            f"знаков; MCP-сервер отвечает, его инструменты: {', '.join(tools) or 'нет'}"
+        detail=t(
+            "Проверка орфографии ещё не сделана. Текст дошёл: {count} знаков; "
+            "MCP-сервер отвечает, его инструменты: {tools}",
+            count=len(request.text),
+            tools=", ".join(tools) or t("нет"),
         ),
     )

@@ -3,6 +3,7 @@
 // собирает api: правила оформления живут в одном месте
 
 import { query, send, showError } from "./http.js";
+import { t } from "./i18n.js";
 
 const dialog = document.getElementById("source");
 const form = document.getElementById("source-form");
@@ -25,7 +26,7 @@ export function showSource(path, view, action, save) {
   sourceKind = source.kind;
   sourceSave = save;
   document.getElementById("source-heading").textContent =
-    source.kind === "web" ? "Веб-страница" : "Данные книги";
+    source.kind === "web" ? t("Веб-страница") : t("Данные книги");
   document.getElementById("source-file").textContent =
     source.kind === "web" ? source.url : fileName(path);
   document.getElementById("source-submit").textContent = action;
@@ -69,8 +70,8 @@ async function previewSource() {
 function showPreview(view) {
   document.getElementById("source-link").textContent = view.link;
   document.getElementById("source-footnote-title").textContent = view.page
-    ? `Сноска на ${view.page}-ю страницу файла`
-    : "Сноска";
+    ? t("Сноска на {page}-ю страницу файла", { page: view.page })
+    : t("Сноска");
   footnote.textContent = view.footnote;
 }
 

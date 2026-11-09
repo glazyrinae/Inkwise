@@ -12,5 +12,14 @@
       },
       "default": "article"
     }
+  },
+  "translations": {
+    "en": {
+      "Научная статья": "Scientific article",
+      "Стили Word для научного текста: шрифт и интервалы, поля, заголовки, таблицы, рисунки и подписи к ним, формулы, сноски, УДК, авторы, аннотация. По ним создаются новые блоки и собирается публикация, уже написанные тексты не меняются. Статья — поля 20 мм; отчёт — поля 30/15/20/20 мм, подписи 14 пт; APA — 12 пт через два интервала, по левому краю, заголовки без номеров.": "Word styles for scientific writing: font and spacing, margins, headings, tables, figures and their captions, equations, footnotes, UDC, authors, abstract. New blocks are created and the publication is compiled with them; texts already written do not change. Article — 20 mm margins; report — 30/15/20/20 mm margins, 14 pt captions; APA — 12 pt double-spaced, left-aligned, unnumbered headings.",
+      "Требования к оформлению": "Formatting requirements",
+      "Отчёт по ГОСТ 7.32–2017": "Research report (GOST 7.32–2017)",
+      "APA, 7-е издание": "APA, 7th edition"
+    }
   }
 }

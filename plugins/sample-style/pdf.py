@@ -25,6 +25,7 @@ from typing import Any
 import pymupdf
 
 from .style import Style, Text, interval, sheet
+from .words import t
 
 # Оформление видно по первым страницам, а большой PDF читался бы долго
 PAGES = 40
@@ -94,17 +95,25 @@ def read(path: Path) -> Style:
     try:
         pdf = pymupdf.open(path)
     except pymupdf.FileDataError:
-        raise ValueError("Файл не открылся как PDF") from None
+        raise ValueError(t("Файл не открылся как PDF")) from None
     with pdf:
         width, height = pdf[0].rect.width, pdf[0].rect.height
         lines, replaced = _lines(pdf)
-        notes = [f"Прочитаны первые {PAGES} страниц"] if pdf.page_count > PAGES else []
+        notes = (
+            [t("Прочитаны первые {pages} страниц", pages=PAGES)]
+            if pdf.page_count > PAGES
+            else []
+        )
     for font in sorted(replaced):
-        notes.append(f"{font} в PDF — замена {ORIGINALS[font]}, в шаблоне оригинал")
+        original = ORIGINALS[font]
+        note = "{font} в PDF — замена {original}, в шаблоне оригинал"
+        notes.append(t(note, font=font, original=original))
     if len(lines) < 20:
         raise ValueError(
-            "В PDF почти нет текста — это скан или картинки? Нужен PDF с текстом или "
-            "документ Word"
+            t(
+                "В PDF почти нет текста — это скан или картинки? Нужен PDF с текстом "
+                "или документ Word"
+            )
         )
     return _Sample(lines, width, height).style(notes)
 
@@ -166,7 +175,7 @@ class _Sample:
         top = _margin(self.top)
         bottom = _margin(self.height - self.bottom) if self.bottom else top
         if not self.bottom:
-            notes.append("Нижнее поле по образцу не видно — взято, как верхнее")
+            notes.append(t("Нижнее поле по образцу не видно — взято, как верхнее"))
         # Нижнее поле видно с точностью до строки: последняя строка страницы стоит не
         # вплотную к нему, а то и строкой выше — так переносят абзацы. Чаще всего оно
         # равно верхнему
@@ -174,10 +183,10 @@ class _Sample:
             bottom = top
         headings, numbered = self._headings()
         if sum(line.x0 > self.width / 2 for line in self.body) > 0.25 * len(self.body):
-            notes.append("Образец набран в две колонки, шаблон — в одну")
+            notes.append(t("Образец набран в две колонки, шаблон — в одну"))
         if re.search(r"OCR|GlyphLess", self.font):
             notes.append(
-                "Текст в PDF — распознанный скан: шрифт и размеры, наверное, неверны"
+                t("Текст в PDF — распознанный скан: шрифт и размеры, наверное, неверны")
             )
         return Style(
             page=sheet(self.width * MM, self.height * MM),

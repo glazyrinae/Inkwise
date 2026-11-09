@@ -10,6 +10,7 @@ import re
 
 import trafilatura
 
+from app.service.language import t
 from app.service.sources.models import WebPage
 
 # Копия — HTML: его открывает просмотрщик ONLYOFFICE
@@ -25,7 +26,7 @@ COPY = """<!doctype html>
 <link rel="canonical" href="{url}">
 </head>
 <body>
-<p><i>Копия страницы <a href="{url}">{url}</a>, дата обращения {accessed}</i></p>
+<p><i>{note}</i></p>
 {article}
 </body>
 </html>
@@ -56,12 +57,15 @@ def copy(source: WebPage, page: bytes | None) -> str:
         else None
     )
     body = BODY.search(article) if article else None
-    text = body.group(1) if body else NO_TEXT
+    text = body.group(1) if body else t(NO_TEXT)
     if "<h1" not in text:
         text = f"<h1>{html.escape(source.title)}</h1>\n{text}"
-    return COPY.format(
-        title=html.escape(source.title),
-        url=html.escape(source.url),
+    url = html.escape(source.url)
+    note = t(
+        "Копия страницы {link}, дата обращения {accessed}",
+        link=f'<a href="{url}">{url}</a>',
         accessed=html.escape(source.accessed),
-        article=text,
+    )
+    return COPY.format(
+        title=html.escape(source.title), url=url, note=note, article=text
     )

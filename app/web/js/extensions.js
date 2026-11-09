@@ -4,6 +4,7 @@
 // в api. Что плагин сообщает о себе в книге, видно под его настройками
 
 import { query, request, send, showError } from "./http.js";
+import { t } from "./i18n.js";
 
 const list = document.getElementById("extensions");
 const fileInput = document.getElementById("plugin-file");
@@ -12,7 +13,7 @@ export async function showExtensions() {
   const plugins = await request("/api/plugins");
   list.replaceChildren(...plugins.map(card));
   if (!plugins.length) {
-    list.append(element("p", "Плагинов нет: импортируй архив .zip кнопкой «+»", "empty"));
+    list.append(element("p", t("Плагинов нет: импортируй архив .zip кнопкой «+»"), "empty"));
   }
 }
 
@@ -40,19 +41,19 @@ function card(plugin) {
 function file(plugin, key, setting) {
   const label = element("div", setting.title, "file-setting");
   const row = element("div", "", "file-row");
-  const name = element("span", plugin.values[key] || "не загружен", "file-name");
+  const name = element("span", plugin.values[key] || t("не загружен"), "file-name");
   const input = document.createElement("input");
   input.type = "file";
   input.accept = setting.accept.join(",");
   input.hidden = true;
-  const choose = element("button", plugin.values[key] ? "Заменить…" : "Загрузить…");
+  const choose = element("button", plugin.values[key] ? t("Заменить…") : t("Загрузить…"));
   choose.type = "button";
   choose.addEventListener("click", () => input.click());
   input.addEventListener("change", () => {
     const [chosen] = input.files;
     input.value = "";
     if (!chosen) return;
-    name.textContent = `${chosen.name}: разбираю…`;
+    name.textContent = t("{file}: разбираю…", { file: chosen.name });
     choose.disabled = true;
     upload(plugin, key, chosen).catch((error) => {
       showError(error);
@@ -61,7 +62,7 @@ function file(plugin, key, setting) {
   });
   row.append(name, choose, input);
   if (plugin.values[key]) {
-    const forget = element("button", "Убрать");
+    const forget = element("button", t("Убрать"));
     forget.type = "button";
     forget.addEventListener("click", () => removeFile(plugin, key).catch(showError));
     row.append(forget);
@@ -83,15 +84,21 @@ async function upload(plugin, key, chosen) {
   const notes = [];
   if (fonts.length) {
     notes.push(
-      `Скачаны шрифты для office: ${fonts.join(", ")}. Office поставит их сам ` +
-        "примерно за минуту, открытые тексты при этом переподключатся. Чтобы новые " +
-        "шрифты появились в редакторе, обнови страницу.",
+      t(
+        "Скачаны шрифты для office: {fonts}. Office поставит их сам примерно за минуту, " +
+          "открытые тексты при этом переподключатся. Чтобы новые шрифты появились в " +
+          "редакторе, обнови страницу.",
+        { fonts: fonts.join(", ") },
+      ),
     );
   }
   if (shadowedBy) {
     notes.push(
-      `Шаблон книги сейчас даёт «${shadowedBy}»: выключи этот плагин в книге, ` +
-        `чтобы работал «${plugin.name}».`,
+      t(
+        "Шаблон книги сейчас даёт «{other}»: выключи этот плагин в книге, чтобы работал " +
+          "«{plugin}».",
+        { other: shadowedBy, plugin: plugin.name },
+      ),
     );
   }
   if (notes.length) alert(notes.join("\n\n"));
@@ -111,7 +118,7 @@ function toggle(plugin) {
   box.addEventListener("change", () =>
     save(plugin, { enabled: box.checked }).catch(showError),
   );
-  label.append(box, "Включён в этой книге");
+  label.append(box, t("Включён в этой книге"));
   return label;
 }
 
@@ -131,7 +138,7 @@ function choice(plugin, key, setting) {
 }
 
 function removeButton(plugin) {
-  const button = element("button", "Удалить", "remove");
+  const button = element("button", t("Удалить"), "remove");
   button.type = "button";
   button.addEventListener("click", () => remove(plugin).catch(showError));
   return button;
@@ -144,10 +151,13 @@ async function save(plugin, change) {
 }
 
 async function remove(plugin) {
-  const question =
-    `Удалить плагин «${plugin.name}»?\n\n` +
-    "Папка плагина уйдёт в корзину плагинов — .корзина в папке плагинов, " +
-    "оттуда его можно вернуть.";
+  const question = [
+    t("Удалить плагин «{plugin}»?", { plugin: plugin.name }),
+    t(
+      "Папка плагина уйдёт в корзину плагинов — .корзина в папке плагинов, оттуда его " +
+        "можно вернуть.",
+    ),
+  ].join("\n\n");
   if (!confirm(question)) return;
   await request(`/api/plugins/${encodeURIComponent(plugin.id)}`, { method: "DELETE" });
   await showExtensions();

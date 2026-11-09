@@ -30,9 +30,9 @@ from docx.text.paragraph import Paragraph
 from docxcompose.composer import Composer  # type: ignore[import-untyped]
 
 from app.service.book import blocks, headings, paths, tables, texts, transfer
+from app.service.language import t
 from app.service.office import builder
 from app.service.sources import store, styles
-from app.settings.config import config
 
 # Код поля сноски: «ADDIN WRITER_CITATION {"source": …, "pages": …}»
 CITATION = re.compile(r"WRITER_CITATION\s*(\{[^{}]*\})")
@@ -59,7 +59,7 @@ def build() -> str:
         builder.BuilderError: office не заполнил содержание — публикация собрана без
             него.
     """
-    file = paths.root() / config.book.document
+    file = paths.publication()
     texts.create(file)
     composer = Composer(docx.Document(str(file)))
     document = composer.doc
@@ -94,13 +94,13 @@ def build() -> str:
 
 def path() -> str | None:
     """Путь публикации, если её уже собирали."""
-    file = paths.root() / config.book.document
+    file = paths.publication()
     return paths.relative(file) if file.is_file() else None
 
 
 def remove() -> None:
     """Удаляет публикацию: её всегда можно собрать снова."""
-    (paths.root() / config.book.document).unlink(missing_ok=True)
+    paths.publication().unlink(missing_ok=True)
 
 
 def _contents(document: Document, after_title_page: bool) -> None:
@@ -110,7 +110,7 @@ def _contents(document: Document, after_title_page: bool) -> None:
     как в Word, — заголовок первого уровня, но с уровнем основного текста.
     """
     title = document.add_paragraph(
-        "СОДЕРЖАНИЕ", headings.style(document, "TOC Heading")
+        t("СОДЕРЖАНИЕ"), headings.style(document, "TOC Heading")
     )
     headings.unnumbered(title)
     title.paragraph_format.page_break_before = after_title_page
@@ -206,7 +206,7 @@ def _sources_list(document: Document, keys: set[str]) -> None:
         return
     # Заголовок первого уровня без номера: с новой страницы и в содержании
     heading = document.add_paragraph(
-        "СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ", headings.style(document, "Heading 1")
+        t("СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ"), headings.style(document, "Heading 1")
     )
     headings.unnumbered(heading)
     heading.paragraph_format.page_break_before = True

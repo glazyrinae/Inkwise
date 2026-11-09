@@ -27,6 +27,7 @@ from docx.opc.packuri import PackURI
 from docx.opc.part import Part
 
 from app.service.book import paths, trash
+from app.service.language import t
 from app.settings.config import config
 
 # По пространству имён импорт отличает книгу от других частей customXml
@@ -78,7 +79,7 @@ def restore(file: bytes) -> None:
         else:
             target.write_bytes(content)
     # Публикация — сам файл: чтобы посмотреть книгу, собирать её заново не нужно
-    (root / config.book.document).write_bytes(file)
+    paths.publication().write_bytes(file)
 
 
 def _pack() -> bytes:
@@ -89,7 +90,7 @@ def _pack() -> bytes:
     for folder, folders, files in root.walk():
         if folder == root:
             folders[:] = [name for name in folders if name != config.book.trash]
-            files = [name for name in files if name != config.book.document]
+            files = [name for name in files if name != paths.publication().name]
         for name in sorted(files):
             entry = folder / name
             path = entry.relative_to(root).as_posix()
@@ -125,12 +126,14 @@ def _book(file: bytes) -> ElementTree.Element:
                     if part.tag == BOOK:
                         return part
     except zipfile.BadZipFile:
-        raise ValueError("Это не документ Word .docx") from None
+        raise ValueError(t("Это не документ Word .docx")) from None
     except ElementTree.ParseError:
-        raise ValueError(BROKEN) from None
+        raise ValueError(t(BROKEN)) from None
     raise ValueError(
-        "В файле нет книги Inkwise: импортировать можно только публикацию, "
-        "собранную в Inkwise"
+        t(
+            "В файле нет книги Inkwise: импортировать можно только публикацию, "
+            "собранную в Inkwise"
+        )
     )
 
 
@@ -144,7 +147,7 @@ def _entries(book: ElementTree.Element) -> list[tuple[PurePosixPath, bytes | str
         ValueError: другая версия книги или книга испорчена.
     """
     if book.get("version") != VERSION:
-        raise ValueError("Книгу в файле записала другая версия Inkwise")
+        raise ValueError(t("Книгу в файле записала другая версия Inkwise"))
     entries: dict[PurePosixPath, bytes | str] = {}
     for element in book:
         written = element.get("path", "")
@@ -157,7 +160,7 @@ def _entries(book: ElementTree.Element) -> list[tuple[PurePosixPath, bytes | str
             or path.parts[0] == config.book.trash
         )
         if unsafe or path in entries or element.tag not in (FILE, LINK):
-            raise ValueError(BROKEN)
+            raise ValueError(t(BROKEN))
         try:
             entries[path] = (
                 element.get("target", "")
@@ -165,8 +168,8 @@ def _entries(book: ElementTree.Element) -> list[tuple[PurePosixPath, bytes | str
                 else base64.b64decode(element.text or "", validate=True)
             )
         except ValueError:
-            raise ValueError(BROKEN) from None
+            raise ValueError(t(BROKEN)) from None
     links = {path for path, content in entries.items() if isinstance(content, str)}
     if any(links & set(path.parents) for path in entries):
-        raise ValueError(BROKEN)
+        raise ValueError(t(BROKEN))
     return sorted(entries.items(), key=lambda entry: isinstance(entry[1], str))

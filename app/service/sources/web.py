@@ -10,6 +10,7 @@ from urllib.parse import unquote
 import httpx
 import trafilatura
 
+from app.service.language import t
 from app.service.sources.description import heading
 from app.service.sources.models import WebPage
 from app.settings.config import config
@@ -37,15 +38,24 @@ def download(url: str) -> tuple[str, bytes]:
         # Своё пояснение у сайта бывает длинным: Википедия пишет о политике для роботов
         status = error.response.status_code
         raise PageError(
-            f"сайт ответил {status} {httpx.codes.get_reason_phrase(status)}"
+            t(
+                "сайт ответил {status} {reason}",
+                status=status,
+                reason=httpx.codes.get_reason_phrase(status),
+            )
         ) from error
     except httpx.HTTPError as error:
-        raise PageError(f"сайт не ответил ({type(error).__name__})") from error
+        raise PageError(
+            t("сайт не ответил ({reason})", reason=type(error).__name__)
+        ) from error
     content_type = response.headers.get("content-type", "")
     if "html" not in content_type:
         raise PageError(
-            f"по адресу не веб-страница, а файл {content_type}: "
-            "скачай его и подключи как книгу"
+            t(
+                "по адресу не веб-страница, а файл {type}: скачай его и подключи "
+                "как книгу",
+                type=content_type,
+            )
         )
     return readable(str(response.url)), response.content
 

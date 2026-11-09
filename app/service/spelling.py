@@ -8,6 +8,7 @@
 import anyio
 from mcp import Client
 
+from app.service.language import t
 from app.settings.config import config
 
 
@@ -37,5 +38,5 @@ def _reason(error: BaseException) -> str:
     while isinstance(error, BaseExceptionGroup):
         error = error.exceptions[0]
     if isinstance(error, TimeoutError):
-        return f"не ответил за {config.spelling.timeout} с"
+        return t("не ответил за {seconds} с", seconds=config.spelling.timeout)
     return f"{type(error).__name__}: {error}"

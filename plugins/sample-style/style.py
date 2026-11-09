@@ -4,6 +4,10 @@
 
 from dataclasses import dataclass, field
 
+from app.settings.config import config
+
+from .words import t
+
 ALIGN = {"left": "слева", "center": "по центру", "right": "справа", "both": "по ширине"}
 PLACE = {"top": "вверху", "bottom": "внизу"}
 # Обычные межстрочные интервалы Word
@@ -53,37 +57,60 @@ class Style:
         width, height = self.page
         top, right, bottom, left = (_number(margin) for margin in self.margins)
         lines = [
-            f"Лист {_number(width)}×{_number(height)} мм, поля: верхнее {top}, "
-            f"правое {right}, нижнее {bottom}, левое {left} мм",
-            f"Текст: {describe(self.body)}",
+            t(
+                "Лист {width}×{height} мм, поля: верхнее {top}, правое {right}, нижнее "
+                "{bottom}, левое {left} мм",
+                width=_number(width),
+                height=_number(height),
+                top=top,
+                right=right,
+                bottom=bottom,
+                left=left,
+            ),
+            t("Текст: {look}", look=describe(self.body)),
         ]
-        numbers = "с номерами «1.1»" if self.numbered else "без номеров"
         for level, heading in enumerate(self.headings, start=1):
-            lines.append(f"Заголовок {level}: {describe(heading, self.body)}")
+            look = describe(heading, self.body)
+            lines.append(t("Заголовок {level}: {look}", level=level, look=look))
         if self.headings:
-            lines.append(f"Заголовки {numbers}")
+            numbered = self.numbered
+            lines.append(
+                t("Заголовки с номерами «1.1»")
+                if numbered
+                else t("Заголовки без номеров")
+            )
         missing = []
         parts = {
-            "подпись рисунка": self.figure,
-            "подпись таблицы": self.table,
-            "сноски": self.footnote,
-            "содержание": self.contents,
-            "список источников": self.references,
+            "Подпись рисунка": self.figure,
+            "Подпись таблицы": self.table,
+            "Сноски": self.footnote,
+            "Содержание": self.contents,
+            "Список источников": self.references,
         }
         for name, text in parts.items():
             if text:
-                lines.append(f"{name.capitalize()}: {describe(text, self.body)}")
+                look = describe(text, self.body)
+                lines.append(t("{part}: {look}", part=t(name), look=look))
             else:
-                missing.append(name)
+                missing.append(t(name).lower())
         if self.page_number:
             place, align = self.page_number
-            lines.append(f"Номер страницы: {PLACE[place]} {ALIGN[align]}")
+            lines.append(
+                t(
+                    "Номер страницы: {place} {align}",
+                    place=t(PLACE[place]),
+                    align=t(ALIGN[align]),
+                )
+            )
         else:
-            missing.append("номер страницы")
+            missing.append(t("Номер страницы").lower())
         if not self.headings:
-            missing.insert(0, "заголовки")
+            missing.insert(0, t("Заголовки").lower())
         if missing:
-            lines.append(f"Не нашлось, взято от основного текста: {', '.join(missing)}")
+            found = ", ".join(missing)
+            lines.append(
+                t("Не нашлось, взято от основного текста: {parts}", parts=found)
+            )
         return "\n".join([*lines, *self.notes])
 
 
@@ -93,15 +120,15 @@ def describe(text: Text, body: Text | None = None) -> str:
     parts = []
     if body is None or text.font != body.font:
         parts.append(text.font)
-    parts.append(f"{_number(text.size)} пт")
-    parts += [name for name, on in _marks(text) if on]
+    parts.append(t("{size} пт", size=_number(text.size)))
+    parts += [t(name) for name, on in _marks(text) if on]
     if body is None or text.line != body.line:
-        parts.append(f"интервал {_number(text.line)}")
+        parts.append(t("интервал {line}", line=_number(text.line)))
     if text.indent > 0:
-        parts.append(f"отступ {_number(text.indent / 10)} см")
+        parts.append(t("отступ {indent} см", indent=_number(text.indent / 10)))
     elif text.indent < 0:
-        parts.append(f"выступ {_number(-text.indent / 10)} см")
-    parts.append(ALIGN[text.align])
+        parts.append(t("выступ {indent} см", indent=_number(-text.indent / 10)))
+    parts.append(t(ALIGN[text.align]))
     return ", ".join(parts)
 
 
@@ -114,8 +141,9 @@ def _marks(text: Text) -> list[tuple[str, bool]]:
 
 
 def _number(value: float) -> str:
-    """Число по-русски: «1,25», без лишних нулей."""
-    return f"{round(value, 2):g}".replace(".", ",")
+    """Число без лишних нулей: «1,25» по-русски, «1.25» по-английски."""
+    text = f"{round(value, 2):g}"
+    return text.replace(".", ",") if config.app.language == "ru" else text
 
 
 def interval(ratio: float) -> float:

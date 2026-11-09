@@ -12,6 +12,8 @@ Word. Плагин читает в образце лист и поля, шриф
 
 from pathlib import Path
 
+from app.settings.config import config
+
 from . import build, pdf, word
 
 
@@ -36,7 +38,8 @@ def _prepared(sample: Path) -> tuple[Path, Path]:
         ValueError: образец не читается: не тот файл, скан без текста.
     """
     stat = sample.stat()
-    key = f"{stat.st_size}-{stat.st_mtime_ns}"
+    # Язык в ключе: «что прочитано» написано на языке интерфейса
+    key = f"{stat.st_size}-{stat.st_mtime_ns}-{config.app.language}"
     folder = sample.parent
     result = folder / f".шаблон {key}.docx"
     found = folder / f".прочитано {key}.txt"

@@ -2,8 +2,8 @@
 // оболочке, та отдаёт его api, а api ответит, дошёл ли текст до MCP-сервера
 function spellingMenuItem(selected) {
   return selected
-    ? { id: "spelling", text: "Проверить орфографию" }
-    : { id: "spelling-chapter", text: "Проверить орфографию всего текста" };
+    ? { id: "spelling", text: tr("Проверить орфографию") }
+    : { id: "spelling-chapter", text: tr("Проверить орфографию всего текста") };
 }
 
 function sendForSpelling(text) {

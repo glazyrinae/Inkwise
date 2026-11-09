@@ -6,6 +6,7 @@ from typing import Annotated
 from fastapi import APIRouter, Header, HTTPException, Request
 
 from app.service.book import transfer
+from app.service.language import t
 
 router = APIRouter(tags=["book"])
 
@@ -20,7 +21,7 @@ async def import_book(
 ) -> None:
     """Заменяет книгу книгой из публикации в теле запроса; прежняя уходит в корзину."""
     if content_type != DOCX:
-        raise HTTPException(status_code=415, detail="Нужен документ Word .docx")
+        raise HTTPException(status_code=415, detail=t("Нужен документ Word .docx"))
     try:
         transfer.restore(await request.body())
     except ValueError as error:

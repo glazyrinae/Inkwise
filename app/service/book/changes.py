@@ -12,6 +12,7 @@
 from pathlib import Path
 
 from app.service.book import blocks, paths, texts
+from app.service.language import t
 from app.settings.config import config
 
 # Название в имени папки у блоков, которые не называют сами
@@ -35,9 +36,9 @@ def add(kind: blocks.Kind, title: str | None) -> blocks.Block:
         ValueError: у раздела или своего блока нет названия.
         FileExistsError: такой блок в книге уже есть.
     """
-    title = TITLES.get(kind) or title
+    title = t(TITLES[kind]) if kind in TITLES else title
     if not title:
-        raise ValueError("Нужно название")
+        raise ValueError(t("Нужно название"))
     current = blocks.folders()
     kinds = [blocks.kind_of(folder) for folder in current]
     if kind in TITLES and kind in kinds:
@@ -88,7 +89,7 @@ def reorder(order: list[str]) -> None:
     """
     current = blocks.folders()
     if sorted(order) != sorted(paths.relative(folder) for folder in current):
-        raise ValueError("Блоки книги изменились: обнови страницу")
+        raise ValueError(t("Блоки книги изменились: обнови страницу"))
     _arrange([paths.block(path) for path in order])
 
 

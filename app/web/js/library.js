@@ -4,6 +4,7 @@
 import { query, request, send, showError } from "./http.js";
 import { closeSource, showSource } from "./source-form.js";
 import { saved } from "./storage.js";
+import { t } from "./i18n.js";
 
 const disk = document.getElementById("disk");
 const diskPath = document.getElementById("disk-path");
@@ -41,7 +42,7 @@ async function showFolder(path) {
   if (!items.length) {
     const empty = document.createElement("li");
     empty.className = "empty";
-    empty.textContent = "Здесь нет папок и книг";
+    empty.textContent = t("Здесь нет папок и книг");
     items.push(empty);
   }
   diskList.replaceChildren(...items);
@@ -63,7 +64,7 @@ function diskItem(icon, name, choose) {
 async function chooseBook(path) {
   const view = await request(`/api/library/source${query({ path })}`);
   disk.close();
-  showSource(path, view, "Подключить", async (source) => {
+  showSource(path, view, t("Подключить"), async (source) => {
     const link = await send("POST", `/api/book/books${query({ block })}`, { path, source });
     closeSource();
     await connected(link);
@@ -75,18 +76,18 @@ async function chooseBook(path) {
 async function chooseWebPage(url) {
   const button = webForm.querySelector("button");
   button.disabled = true;
-  button.textContent = "Скачиваю…";
+  button.textContent = t("Скачиваю…");
   try {
     const view = await request(`/api/web/source${query({ url })}`);
     disk.close();
-    showSource(view.source.url, view, "Подключить", async (source) => {
+    showSource(view.source.url, view, t("Подключить"), async (source) => {
       const copy = await send("POST", `/api/book/web${query({ block })}`, source);
       closeSource();
       await connected(copy);
     });
   } finally {
     button.disabled = false;
-    button.textContent = "Подключить страницу";
+    button.textContent = t("Подключить страницу");
   }
 }
 

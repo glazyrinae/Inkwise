@@ -1,6 +1,7 @@
 """Настройки приложения: значения — из config.toml, секреты — из окружения."""
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import (
@@ -12,13 +13,15 @@ from pydantic_settings import (
 
 
 class AppSettings(BaseModel):
-    """Сервис: название, версия, режим отладки, уровень логов и свои имена хоста."""
+    """Сервис: название, версия, режим отладки, уровень логов, свои имена хоста и язык
+    интерфейса."""
 
     title: str
     version: str
     debug: bool
     log_level: str
     hosts: list[str]
+    language: Literal["ru", "en"]
 
 
 class BookSettings(BaseModel):

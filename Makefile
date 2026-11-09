@@ -51,6 +51,17 @@ env-prepare:
 			.env.example > .env; \
 		echo "Создан .env: UID $$(id -u), GID $$(id -g), новый секрет office"; \
 	fi
+	@# Язык интерфейса при сборке: make init language=en
+	@if [ -n "$(language)" ]; then \
+		case "$(language)" in ru|en) ;; *) echo "language: ru или en"; exit 1;; esac; \
+		if grep -q '^APP__LANGUAGE=' .env; then \
+			sed "s/^APP__LANGUAGE=.*/APP__LANGUAGE=$(language)/" .env > .env.tmp \
+				&& mv .env.tmp .env; \
+		else \
+			printf 'APP__LANGUAGE=%s\n' "$(language)" >> .env; \
+		fi; \
+		echo "Язык интерфейса: $(language)"; \
+	fi
 	@if [ ! -f docker-compose.local.yml ]; then \
 		printf 'services: {}\n' > docker-compose.local.yml; \
 	fi

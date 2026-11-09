@@ -6,6 +6,7 @@
 import * as editors from "./editors.js";
 import { request, send, showError } from "./http.js";
 import { action, showBook } from "./tree.js";
+import { t } from "./i18n.js";
 
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const area = document.getElementById("document");
@@ -29,7 +30,7 @@ export function showDocument(path) {
   }
   const hint = document.createElement("p");
   hint.className = "empty";
-  hint.textContent = "Не собрана: галка справа в заголовке «Публикация»";
+  hint.textContent = t("Не собрана: галка справа в заголовке «Публикация»");
   area.replaceChildren(hint);
 }
 
@@ -39,7 +40,7 @@ function documentRow(path) {
   open.className = "file";
   open.dataset.path = path;
   open.textContent = path;
-  open.title = "Публикация: открыть на просмотр";
+  open.title = t("Публикация: открыть на просмотр");
   open.addEventListener("click", () => editors.openFile(path).catch(showError));
   const row = document.createElement("div");
   row.className = "row";
@@ -48,10 +49,10 @@ function documentRow(path) {
     action(
       "download",
       downloadIcon.content.cloneNode(true),
-      "Скачать: экспорт книги в Word. Внутри вся книга, её можно импортировать обратно",
+      t("Скачать: экспорт книги в Word. Внутри вся книга, её можно импортировать обратно"),
       async () => download(path),
     ),
-    action("remove", "✕", "Удалить публикацию", removeDocument),
+    action("remove", "✕", t("Удалить публикацию"), removeDocument),
   );
   return row;
 }
@@ -62,16 +63,19 @@ function download(path) {
   link.href = `/api/files/${encodeURIComponent(path)}`;
   // Шведская запись даты — «2026-11-09 14:30:05», как ISO, но с пробелом
   const now = new Date().toLocaleString("sv-SE").slice(0, 16).replace(":", "-");
-  link.download = `Публикация ${now}.docx`;
+  link.download = `${t("Публикация")} ${now}.docx`;
   link.click();
 }
 
 // Импорт заменяет книгу целиком: дерево, открытые тексты и публикацию берём заново
 async function importBook(file) {
-  const question =
-    `Импортировать книгу из «${file.name}»?\n\n` +
-    "Текущая книга целиком уйдёт в корзину — .корзина в папке книги, оттуда её можно " +
-    "вернуть.";
+  const question = [
+    t("Импортировать книгу из «{file}»?", { file: file.name }),
+    t(
+      "Текущая книга целиком уйдёт в корзину — .корзина в папке книги, оттуда её можно " +
+        "вернуть.",
+    ),
+  ].join("\n\n");
   if (!confirm(question)) return;
   await request("/api/book/import", {
     method: "POST",
@@ -82,7 +86,7 @@ async function importBook(file) {
 }
 
 async function removeDocument() {
-  if (!confirm("Удалить публикацию? Её всегда можно собрать снова.")) return;
+  if (!confirm(t("Удалить публикацию? Её всегда можно собрать снова."))) return;
   editors.closeWhere(isDocument);
   await send("DELETE", "/api/book/document");
   await showBook();

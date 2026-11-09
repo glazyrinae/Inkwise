@@ -11,6 +11,7 @@ from urllib.parse import quote, urlencode
 import httpx
 import jwt
 
+from app.service.language import t
 from app.settings.config import config
 
 # Под этим именем office отдаёт файл, сохранённый скриптом
@@ -55,7 +56,11 @@ def fill_contents(path: str) -> bytes:
             answer = client.post("/docbuilder", json=task).raise_for_status().json()
             if RESULT not in answer.get("urls", {}):
                 # Что значит код ошибки — в документации Document Builder API
-                raise BuilderError(f"office ответил ошибкой {answer.get('error')}")
+                raise BuilderError(
+                    t("office ответил ошибкой {code}", code=answer.get("error"))
+                )
             return client.get(answer["urls"][RESULT]).raise_for_status().content
     except httpx.HTTPError as error:
-        raise BuilderError(f"office не ответил ({type(error).__name__})") from error
+        raise BuilderError(
+            t("office не ответил ({reason})", reason=type(error).__name__)
+        ) from error

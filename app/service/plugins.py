@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field, TypeAdapter
 
 from app.service import fonts
 from app.service.book import paths
+from app.service.language import t
 from app.settings.config import config
 
 # Имя папки плагина — его id: латиница, цифры и «-»
@@ -72,6 +73,11 @@ class Manifest(BaseModel):
     description: str = Field(default="", description="Что делает плагин")
     settings: dict[str, Choice | File] = Field(
         default_factory=dict, description="Настройки: ключ → поле"
+    )
+    translations: dict[str, dict[str, str]] = Field(
+        default_factory=dict,
+        description="Переводы строк манифеста: язык → строка → перевод",
+        examples=[{"en": {"Научная статья": "Scientific article"}}],
     )
 
 
@@ -157,7 +163,9 @@ def change(plugin_id: str, state: State) -> None:
         if isinstance(setting, File):
             continue
         if setting is None or value not in setting.choices:
-            raise ValueError(f"У плагина нет настройки {key} = {value}")
+            raise ValueError(
+                t("У плагина нет настройки {key} = {value}", key=key, value=value)
+            )
     states = _states()
     # Файл настройки меняет только загрузка, см. upload
     files = {
@@ -187,11 +195,11 @@ def upload(plugin_id: str, key: str, name: str, data: bytes) -> Uploaded:
     manifest = _manifest(folder)
     setting = manifest.settings.get(key)
     if not isinstance(setting, File):
-        raise ValueError(f"У плагина нет настройки-файла {key}")
+        raise ValueError(t("У плагина нет настройки-файла {key}", key=key))
     # Скрытые имена — для файлов самого плагина рядом, например кеша
     named = name == Path(name).name and not paths.hidden(name)
     if not named or Path(name).suffix.lower() not in setting.accept:
-        raise ValueError(f"Нужен файл {', '.join(setting.accept)}")
+        raise ValueError(t("Нужен файл {types}", types=", ".join(setting.accept)))
     states = _states()
     state = states.get(plugin_id, State())
     old = state.values.get(key)
@@ -270,7 +278,7 @@ def install(archive: bytes) -> str:
             shutil.rmtree(unpacked, ignore_errors=True)
             zipped.extractall(unpacked)
     except zipfile.BadZipFile:
-        raise ValueError("Это не архив .zip") from None
+        raise ValueError(t("Это не архив .zip")) from None
     try:
         _manifest(unpacked / plugin_id)
     except ValueError:
@@ -302,16 +310,16 @@ def _check(zipped: zipfile.ZipFile, size: int) -> str:
     """
     names = [PurePosixPath(info.filename) for info in zipped.infolist()]
     if size + sum(info.file_size for info in zipped.infolist()) > LIMIT:
-        raise ValueError(f"Плагин больше {LIMIT // 2**20} МБ")
+        raise ValueError(t("Плагин больше {size} МБ", size=LIMIT // 2**20))
     # Имя папки — id плагина. Абсолютный путь или «..» в архиве его не пройдут
     tops = {name.parts[0] for name in names if name.parts}
     plugin_id = tops.pop() if len(tops) == 1 else ""
     if not ID.fullmatch(plugin_id):
         raise ValueError(
-            "В архиве должна быть одна папка плагина: латиница, цифры и «-»"
+            t("В архиве должна быть одна папка плагина: латиница, цифры и «-»")
         )
     if PurePosixPath(plugin_id, "plugin.json") not in names:
-        raise ValueError(f"В папке {plugin_id} архива нет plugin.json")
+        raise ValueError(t("В папке {folder} архива нет plugin.json", folder=plugin_id))
     return plugin_id
 
 
@@ -402,8 +410,33 @@ def _manifest(folder: Path) -> Manifest:
     """
     file = folder / "plugin.json"
     if not file.is_file():
-        raise ValueError(f"У плагина {folder.name} нет plugin.json")
-    return Manifest.model_validate_json(file.read_bytes())
+        raise ValueError(t("У плагина {folder} нет plugin.json", folder=folder.name))
+    return _translated(Manifest.model_validate_json(file.read_bytes()))
+
+
+def _translated(manifest: Manifest) -> Manifest:
+    """Манифест на языке интерфейса: название, описание, подписи настроек и пункты
+    выбора — из его же переводов. Строки без перевода остаются как есть."""
+    words = manifest.translations.get(config.app.language, {})
+    if not words:
+        return manifest
+    settings: dict[str, Choice | File] = {}
+    for key, setting in manifest.settings.items():
+        title = words.get(setting.title, setting.title)
+        if isinstance(setting, Choice):
+            choices = {k: words.get(v, v) for k, v in setting.choices.items()}
+            settings[key] = setting.model_copy(
+                update={"title": title, "choices": choices}
+            )
+        else:
+            settings[key] = setting.model_copy(update={"title": title})
+    return manifest.model_copy(
+        update={
+            "name": words.get(manifest.name, manifest.name),
+            "description": words.get(manifest.description, manifest.description),
+            "settings": settings,
+        }
+    )
 
 
 def _folder(plugin_id: str) -> Path:

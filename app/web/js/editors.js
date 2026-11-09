@@ -4,6 +4,7 @@
 
 import { query, request } from "./http.js";
 import { saved } from "./storage.js";
+import { t } from "./i18n.js";
 
 const hint = document.querySelector("#text .hint");
 const panes = {
@@ -94,7 +95,7 @@ function loadEditorScript(src) {
     script.onerror = () => {
       editorScript = null; // следующая попытка загрузит заново
       script.remove();
-      reject(new Error("Редактор не загрузился: office ещё запускается или не запущен"));
+      reject(new Error(t("Редактор не загрузился: office ещё запускается или не запущен")));
     };
     document.head.append(script);
   });

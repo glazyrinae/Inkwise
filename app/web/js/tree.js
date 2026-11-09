@@ -19,6 +19,7 @@ import * as editors from "./editors.js";
 import { request, showError } from "./http.js";
 import { attachSource, sourcesItem } from "./materials.js";
 import { saved } from "./storage.js";
+import { t } from "./i18n.js";
 
 const sidebar = document.getElementById("chapters");
 const tree = document.getElementById("tree");
@@ -99,17 +100,17 @@ function blockItem(block) {
   row.className = "row";
   row.append(titleOf(block, label));
   if (block.kind === "section") {
-    row.append(action("add", "+", "Добавить подраздел", () => addHeading(block, null)));
+    row.append(action("add", "+", t("Добавить подраздел"), () => addHeading(block, null)));
   }
   row.append(
-    action("attach", paperclip.content.cloneNode(true), "Подключить книгу или веб-страницу", () =>
+    action("attach", paperclip.content.cloneNode(true), t("Подключить книгу или веб-страницу"), () =>
       attachSource(block),
     ),
   );
   if (block.kind === "section" || block.kind === "custom") {
-    row.append(action("edit", "✎", "Переименовать", () => renameBlock(block)));
+    row.append(action("edit", "✎", t("Переименовать"), () => renameBlock(block)));
   }
-  row.append(action("remove", "✕", "Удалить в корзину", () => removeBlock(block, label)));
+  row.append(action("remove", "✕", t("Удалить в корзину"), () => removeBlock(block, label)));
   draggable(row, block.path, (target, after) =>
     moveBlock(block.path, target, after).catch(showError),
   );
@@ -134,7 +135,7 @@ function headingItem(block, heading, number) {
   const lower = LEVELS[heading.level + 1];
   if (lower) {
     const add = () => addHeading(block, heading);
-    row.append(action("add", "+", `Добавить: ${lower.toLowerCase()}`, add));
+    row.append(action("add", "+", t("Добавить: {what}", { what: lower.toLowerCase() }), add));
   }
   const children = heading.children.map((child, index) =>
     headingItem(block, child, `${number}.${index + 1}`),

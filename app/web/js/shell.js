@@ -9,10 +9,13 @@ import { buildDocument } from "./document.js";
 import * as editors from "./editors.js";
 import { showExtensions } from "./extensions.js";
 import { showError } from "./http.js";
+import { translatePage } from "./i18n.js";
 import { openSettings, openSpelling } from "./settings.js";
 import { setupSplitters } from "./splitters.js";
 import { saved } from "./storage.js";
 import { blocksNow, markOpen, showBook, showHeadings } from "./tree.js";
+
+translatePage();
 
 const chapters = document.getElementById("chapters");
 // Что показывает панель слева, как боковая панель VS Code: кнопка в полосе и её области

@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 from app.service.book import blocks, changes, document, trash
 from app.service.book.blocks import Block
+from app.service.language import t
 from app.service.office import builder
 
 router = APIRouter(tags=["book"])
@@ -107,7 +108,7 @@ def build_document() -> str:
     except builder.BuilderError as error:
         raise HTTPException(
             status_code=502,
-            detail=f"Публикация собрана, но без содержания: {error}",
+            detail=t("Публикация собрана, но без содержания: {error}", error=error),
         ) from None
 
 

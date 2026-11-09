@@ -6,7 +6,17 @@
     "sample": {
       "kind": "file",
       "title": "Образец оформления: PDF или Word",
-      "accept": [".pdf", ".docx"]
+      "accept": [
+        ".pdf",
+        ".docx"
+      ]
+    }
+  },
+  "translations": {
+    "en": {
+      "Оформление по образцу": "Style from a sample",
+      "Шаблон текстов и публикации по образцу — PDF или документу Word: лист и поля, шрифт, кегль, интервал, отступы, заголовки, подписи рисунков и таблиц, сноски, номер страницы, содержание и список источников. Стили называются так же, как в «Научной статье». Чего в образце нет, берётся от основного текста. Шаблон книги даёт первый включённый плагин, поэтому «Научную статью» в книге выключи. Шрифта из образца нет в office — api скачает его из Google Fonts.": "A template for texts and the publication from a sample — a PDF or Word document: page and margins, font, size, spacing, indents, headings, figure and table captions, footnotes, page numbers, contents and references. The styles have the same names as in «Scientific article». What the sample lacks is taken from the body text. The book template comes from the first enabled plugin, so turn «Scientific article» off in the book. If office lacks the sample's font, the api downloads it from Google Fonts.",
+      "Образец оформления: PDF или Word": "Formatting sample: PDF or Word"
     }
   }
 }

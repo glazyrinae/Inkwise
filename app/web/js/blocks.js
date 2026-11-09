@@ -6,20 +6,25 @@ import { outline } from "./bridge.js";
 import * as editors from "./editors.js";
 import { query, send } from "./http.js";
 import { blocksNow, showBook } from "./tree.js";
+import { t } from "./i18n.js";
 
 export const KINDS = {
-  title_page: "Титульный лист",
-  introduction: "Введение",
-  section: "Раздел",
-  conclusion: "Заключение",
-  custom: "Свой блок",
+  title_page: t("Титульный лист"),
+  introduction: t("Введение"),
+  section: t("Раздел"),
+  conclusion: t("Заключение"),
+  custom: t("Свой блок"),
 };
-export const LEVELS = { 2: "Подраздел", 3: "Пункт", 4: "Подпункт" };
-const NAMES = { 2: "подраздела", 3: "пункта", 4: "подпункта" };
+export const LEVELS = { 2: t("Подраздел"), 3: t("Пункт"), 4: t("Подпункт") };
+const ASK_HEADING = {
+  2: t("Название подраздела"),
+  3: t("Название пункта"),
+  4: t("Название подпункта"),
+};
 // Название спрашиваем у раздела и своего блока, остальные называются сами
 const ASK = {
-  section: "Название раздела",
-  custom: "Название блока, например: Реферат, Приложение А",
+  section: t("Название раздела"),
+  custom: t("Название блока, например: Реферат, Приложение А"),
 };
 
 // Новый блок встаёт на своё место по ГОСТ, его текст сразу открывается слева. Блоки
@@ -37,7 +42,7 @@ export async function addBlock(kind) {
 // текст переезжает вместе с папкой: ключ документа в office прежний, и правки, ещё не
 // сохранённые на диск, остаются в редакторе
 export async function renameBlock(block) {
-  const title = prompt("Новое название", block.title)?.trim();
+  const title = prompt(t("Новое название"), block.title)?.trim();
   if (!title || title === block.title) return;
   const before = blocksNow().map((found) => found.path);
   await send("PATCH", `/api/book/blocks${query({ path: block.path })}`, { title });
@@ -64,9 +69,11 @@ export async function moveBlock(path, target, after) {
 // ссылкам остаются на диске
 export async function removeBlock(block, label) {
   const lines = [
-    `Удалить «${label}» в корзину?`,
-    "Текст со всеми подразделами и источники лягут в папку .корзина в папке книги — " +
-      "оттуда блок можно вернуть. Книги на диске останутся.",
+    t("Удалить «{label}» в корзину?", { label }),
+    t(
+      "Текст со всеми подразделами и источники лягут в папку .корзина в папке книги — " +
+        "оттуда блок можно вернуть. Книги на диске останутся.",
+    ),
   ];
   if (!confirm(lines.join("\n\n"))) return;
   // Открытый текст закрываем: последние правки office сохранит уже в корзину
@@ -79,7 +86,7 @@ export async function removeBlock(block, label) {
 // заголовок, куда добавить; null — сам раздел. Номер ставит редактор
 export async function addHeading(block, parent) {
   const level = parent ? parent.level + 1 : 2;
-  const text = prompt(`Название ${NAMES[level]}`)?.trim();
+  const text = prompt(ASK_HEADING[level])?.trim();
   if (!text) return;
   await openText(block);
   editors.focusText();
